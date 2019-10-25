@@ -6,11 +6,12 @@ import java.util.TimerTask;
 public class CarControl {
     private BluetoothTool client;
     public static final String GO = "a";
-    public static final String BACK = "b";
-    public static final String LEFT = "c";
-    public static final String RIGHT = "d";
-    public static final String STOP = "e";
-    public static final double turnRate = 1;
+    public static final String BACK = "g";
+    public static final String LEFT = "b";
+    public static final String RIGHT = "c";
+    public static final String STOP = "s";
+    public static final double leftRate = 1050.0 / 90.0;
+    public static final double rightRate = 1200.0 / 90.0;
 
     public CarControl(BluetoothTool client)
     {
@@ -76,7 +77,7 @@ public class CarControl {
             }
         };
         Timer timer = new Timer();
-        timer.schedule(task, (long)(angle*turnRate));
+        timer.schedule(task, (long)(angle*leftRate));
     }
     public void right(double angle)
     {
@@ -88,6 +89,6 @@ public class CarControl {
             }
         };
         Timer timer = new Timer();
-        timer.schedule(task, (long)(angle*turnRate));
+        timer.schedule(task, (long)(angle*rightRate));
     }
 }

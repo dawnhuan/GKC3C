@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class BasicControl extends AppCompatActivity {
 
     private Button go, back, left, right;
     private CarControl control;
+    private long time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +49,30 @@ public class BasicControl extends AppCompatActivity {
         left.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     control.left();
-                else if (event.getAction() == MotionEvent.ACTION_UP)
+                    time = System.currentTimeMillis();
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP) {
                     control.stop();
+                    time = System.currentTimeMillis() - time;
+                    //Toast.makeText(BasicControl.this, Long.toString(time), Toast.LENGTH_LONG).show();  //test for the rate between angle and time
+                }
                 return false;
             }
         });
         right.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     control.right();
-                else if (event.getAction() == MotionEvent.ACTION_UP)
+                    time = System.currentTimeMillis();
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP) {
                     control.stop();
+                    time = System.currentTimeMillis() - time;
+                    //Toast.makeText(BasicControl.this, Long.toString(time), Toast.LENGTH_LONG).show();
+                }
                 return false;
             }
         });
