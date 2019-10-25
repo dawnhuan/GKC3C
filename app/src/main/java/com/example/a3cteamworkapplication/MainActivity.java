@@ -29,6 +29,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothReceiver bluetoothReceiver;
     private BluetoothAdapter bluetoothAdapter;
 
-    private BluetoothTool client;
+    public static BluetoothTool client;
 
     private static final int REQUEST_ENABLE = 1;
     private static final int REQUEST_DISCOVERABLE = 2;
@@ -226,7 +228,8 @@ public class MainActivity extends AppCompatActivity {
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showConfirmDialog("start\n");
+                Intent intent = new Intent(MainActivity.this, BasicControl.class);
+                startActivity(intent);
             }
         });
 

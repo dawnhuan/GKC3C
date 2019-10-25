@@ -23,13 +23,13 @@ public class BluetoothTool {
     private ReadTask readTask;
 
     private Handler handler;
+    public static final int DISCONNECT = 6;
 
     public static final int CONNECT_FAILED = 1;
     public static final int CONNECT_SUCCESS = 5;
     public static final int READ_FAILED = 2;
     public static final int WRITE_FAILED = 3;
     public static final int DATA = 4;
-    public static final int DISCONNECT = 6;
 
     private boolean isConnect = false;
 
