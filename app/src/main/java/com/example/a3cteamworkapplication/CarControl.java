@@ -43,7 +43,7 @@ public class CarControl {
         BluetoothTool.WriteTask writeTask = client.new WriteTask(STOP);
         writeTask.start();
     }
-    public void go(double time)
+    public void go(double time) //前进时间
     {
         go();
         TimerTask task = new TimerTask() {
@@ -67,7 +67,7 @@ public class CarControl {
         Timer timer = new Timer();
         timer.schedule(task, (long)(time*1000));
     }
-    public void left(double angle)
+    public void left(double angle) //转向的角度
     {
         left();
         TimerTask task = new TimerTask() {

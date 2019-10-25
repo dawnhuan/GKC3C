@@ -66,12 +66,13 @@
         android:layout_below="@id/devicesLV"
         android:orientation="horizontal"
         android:weightSum="3">
+
         <Button
             android:id="@+id/someBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="一个按键" />
+            android:text="方向键控制" />
 
         <Button
             android:id="@+id/anotherBtn"
