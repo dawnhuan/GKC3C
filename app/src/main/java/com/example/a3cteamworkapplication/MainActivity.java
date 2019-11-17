@@ -1,5 +1,6 @@
 package com.example.a3cteamworkapplication;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,6 +11,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -25,11 +28,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private Button stopSearchBtn;
     private Button disconnectBtn;
     private ListView devicesLV;
-    private Button startBtn, armBtn, takeoffBtn, killBtn, disarmBtn, manualBtn;
+    private Button BasicBtn, VoiceBtn, takeoffBtn, killBtn, disarmBtn, manualBtn;
     private ScrollView scrollView;
     private TextView receiveTV;
     private EditText sendET;
@@ -83,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
                     showStatus("连接成功");
                     searchBtn.setEnabled(false);
                     disconnectBtn.setEnabled(true);
-                    startBtn.setEnabled(true);
-                    armBtn.setEnabled(true);
+                    BasicBtn.setEnabled(true);
+                    VoiceBtn.setEnabled(true);
                     takeoffBtn.setEnabled(true);
                     killBtn.setEnabled(true);
                     disarmBtn.setEnabled(true);
@@ -107,8 +112,8 @@ public class MainActivity extends AppCompatActivity {
                     searchBtn.setEnabled(true);
                     stopSearchBtn.setEnabled(false);
                     disconnectBtn.setEnabled(false);
-                    startBtn.setEnabled(false);
-                    armBtn.setEnabled(false);
+                    BasicBtn.setEnabled(false);
+                    VoiceBtn.setEnabled(false);
                     takeoffBtn.setEnabled(false);
                     killBtn.setEnabled(false);
                     disarmBtn.setEnabled(false);
@@ -124,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        requestPermissions();
 
         setupUI();
 
@@ -143,8 +149,8 @@ public class MainActivity extends AppCompatActivity {
         disconnectBtn = (Button) findViewById(R.id.disconnectBtn);
         devicesLV = (ListView) findViewById(R.id.devicesLV);
 
-        startBtn = (Button) findViewById(R.id.someBtn);
-        armBtn = (Button) findViewById(R.id.anotherBtn);
+        BasicBtn = (Button) findViewById(R.id.BasicBtn);
+        VoiceBtn = (Button) findViewById(R.id.VoiceBtn);
         takeoffBtn = (Button) findViewById(R.id.oneMoreBtn);
         killBtn = (Button) findViewById(R.id.againOneBtn);
         disarmBtn = (Button) findViewById(R.id.dioBtn);
@@ -156,8 +162,8 @@ public class MainActivity extends AppCompatActivity {
 
         stopSearchBtn.setEnabled(false);
         disconnectBtn.setEnabled(false);
-        startBtn.setEnabled(false);
-        armBtn.setEnabled(false);
+        BasicBtn.setEnabled(false);
+        VoiceBtn.setEnabled(false);
         takeoffBtn.setEnabled(false);
         killBtn.setEnabled(false);
         disarmBtn.setEnabled(false);
@@ -225,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        startBtn.setOnClickListener(new View.OnClickListener() {
+        BasicBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, BasicControl.class);
@@ -233,10 +239,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        armBtn.setOnClickListener(new View.OnClickListener() {
+        VoiceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showConfirmDialog("test\n");
+                Intent intent = new Intent(MainActivity.this, VoiceControl.class);
+                startActivity(intent);
             }
         });
 
@@ -404,5 +411,30 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
         return true;
+    }
+
+    public void requestPermissions()
+    {
+        try {
+            if (Build.VERSION.SDK_INT >= 23) {
+                int permission = ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                if(permission!= PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,new String[]
+                            {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    Manifest.permission.LOCATION_HARDWARE,Manifest.permission.READ_PHONE_STATE,
+                                    Manifest.permission.WRITE_SETTINGS,Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.RECORD_AUDIO,Manifest.permission.READ_CONTACTS},0x0010);
+                }
+
+                if(permission != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,new String[] {
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION},0x0010);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

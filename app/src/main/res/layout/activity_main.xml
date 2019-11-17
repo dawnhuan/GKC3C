@@ -68,18 +68,18 @@
         android:weightSum="3">
 
         <Button
-            android:id="@+id/someBtn"
+            android:id="@+id/BasicBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="方向键控制" />
 
         <Button
-            android:id="@+id/anotherBtn"
+            android:id="@+id/VoiceBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="另一个按键"/>
+            android:text="语音控制" />
 
         <Button
             android:id="@+id/oneMoreBtn"
