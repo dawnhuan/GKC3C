@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private Button stopSearchBtn;
     private Button disconnectBtn;
     private ListView devicesLV;
-    private Button BasicBtn, VoiceBtn, takeoffBtn, killBtn, disarmBtn, manualBtn;
+    private Button BasicBtn, VoiceBtn, PaintBtn, killBtn, disarmBtn, manualBtn;
     private ScrollView scrollView;
     private TextView receiveTV;
     private EditText sendET;
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                     disconnectBtn.setEnabled(true);
                     BasicBtn.setEnabled(true);
                     VoiceBtn.setEnabled(true);
-                    takeoffBtn.setEnabled(true);
+                    PaintBtn.setEnabled(true);
                     killBtn.setEnabled(true);
                     disarmBtn.setEnabled(true);
                     manualBtn.setEnabled(true);
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     disconnectBtn.setEnabled(false);
                     BasicBtn.setEnabled(false);
                     VoiceBtn.setEnabled(false);
-                    takeoffBtn.setEnabled(false);
+                    PaintBtn.setEnabled(false);
                     killBtn.setEnabled(false);
                     disarmBtn.setEnabled(false);
                     manualBtn.setEnabled(false);
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
         BasicBtn = (Button) findViewById(R.id.BasicBtn);
         VoiceBtn = (Button) findViewById(R.id.VoiceBtn);
-        takeoffBtn = (Button) findViewById(R.id.oneMoreBtn);
+        PaintBtn = (Button) findViewById(R.id.PaintBtn);
         killBtn = (Button) findViewById(R.id.againOneBtn);
         disarmBtn = (Button) findViewById(R.id.dioBtn);
         manualBtn = (Button) findViewById(R.id.finalBtn);
@@ -162,9 +162,9 @@ public class MainActivity extends AppCompatActivity {
 
         stopSearchBtn.setEnabled(false);
         disconnectBtn.setEnabled(false);
-        BasicBtn.setEnabled(false);
+//        BasicBtn.setEnabled(false);
         VoiceBtn.setEnabled(false);
-        takeoffBtn.setEnabled(false);
+//        takeoffBtn.setEnabled(false);
         killBtn.setEnabled(false);
         disarmBtn.setEnabled(false);
         manualBtn.setEnabled(false);
@@ -247,11 +247,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        takeoffBtn.setOnClickListener(new View.OnClickListener() {
+        PaintBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showConfirmDialog("arm\n");
-                showConfirmDialog("takeoff\n");
+                Intent intent = new Intent(MainActivity.this, PaintControl.class);
+                startActivity(intent);
             }
         });
 

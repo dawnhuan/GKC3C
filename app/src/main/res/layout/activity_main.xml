@@ -82,11 +82,11 @@
             android:text="语音控制" />
 
         <Button
-            android:id="@+id/oneMoreBtn"
+            android:id="@+id/PaintBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="又是一个按键"/>
+            android:text="画线控制"/>
 
 
     </LinearLayout>
