@@ -17,7 +17,7 @@
             android:id="@+id/text_paint"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Draw your intended route here!" />
+            android:text="Please draw your route here." />
     </FrameLayout>
 
     <Button

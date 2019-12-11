@@ -48,7 +48,7 @@ public class PaintView extends View
     }
     public Vector<pointT> route;
     private int count;
-    private static final int sampleInterval = 10;
+    private static final int sampleInterval = 3;
 
     public PaintView(Context context)
     {
@@ -110,11 +110,6 @@ public class PaintView extends View
         float x = event.getX();
         float y = event.getY();
 
-        if(++count >= sampleInterval){
-            route.add(new pointT(x, y));
-            count = 0;
-        }
-
         switch (event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
@@ -153,7 +148,10 @@ public class PaintView extends View
     {
         clear();
         myPath.reset();
+        route.clear();
         myPath.moveTo(x, y);
+        route.add(new pointT(x, y));
+        count = 0;
         mX = x;
         mY = y;
     }
@@ -164,6 +162,11 @@ public class PaintView extends View
         float dy = Math.abs(y - mY);
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE)
         {
+            if(++count >= sampleInterval){
+                route.add(new pointT(x, y));
+                count = 0;
+            }
+
             myPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             mX = x;
             mY = y;

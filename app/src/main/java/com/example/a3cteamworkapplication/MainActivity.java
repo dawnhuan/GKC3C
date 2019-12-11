@@ -162,9 +162,9 @@ public class MainActivity extends AppCompatActivity {
 
         stopSearchBtn.setEnabled(false);
         disconnectBtn.setEnabled(false);
-//        BasicBtn.setEnabled(false);
+        BasicBtn.setEnabled(false);
         VoiceBtn.setEnabled(false);
-//        takeoffBtn.setEnabled(false);
+        PaintBtn.setEnabled(false);
         killBtn.setEnabled(false);
         disarmBtn.setEnabled(false);
         manualBtn.setEnabled(false);
