@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private Button stopSearchBtn;
     private Button disconnectBtn;
     private ListView devicesLV;
-    private Button BasicBtn, VoiceBtn, PaintBtn, killBtn, disarmBtn, manualBtn;
+    private Button BasicBtn, VoiceBtn, oneBtn, killBtn, PaintBtn, manualBtn;
     private ScrollView scrollView;
     private TextView receiveTV;
     private EditText sendET;
@@ -90,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
                     disconnectBtn.setEnabled(true);
                     BasicBtn.setEnabled(true);
                     VoiceBtn.setEnabled(true);
-                    PaintBtn.setEnabled(true);
+                    oneBtn.setEnabled(true);
                     killBtn.setEnabled(true);
-                    disarmBtn.setEnabled(true);
+                    PaintBtn.setEnabled(true);
                     manualBtn.setEnabled(true);
                     devicesLV.setEnabled(false);
                     sendBtn.setEnabled(true);
@@ -114,9 +114,9 @@ public class MainActivity extends AppCompatActivity {
                     disconnectBtn.setEnabled(false);
                     BasicBtn.setEnabled(false);
                     VoiceBtn.setEnabled(false);
-                    PaintBtn.setEnabled(false);
+                    oneBtn.setEnabled(false);
                     killBtn.setEnabled(false);
-                    disarmBtn.setEnabled(false);
+                    PaintBtn.setEnabled(false);
                     manualBtn.setEnabled(false);
                     devicesLV.setEnabled(true);
                     sendBtn.setEnabled(false);
@@ -151,9 +151,9 @@ public class MainActivity extends AppCompatActivity {
 
         BasicBtn = (Button) findViewById(R.id.BasicBtn);
         VoiceBtn = (Button) findViewById(R.id.VoiceBtn);
-        PaintBtn = (Button) findViewById(R.id.PaintBtn);
+        oneBtn = (Button) findViewById(R.id.PaintBtn);
         killBtn = (Button) findViewById(R.id.againOneBtn);
-        disarmBtn = (Button) findViewById(R.id.dioBtn);
+        PaintBtn = (Button) findViewById(R.id.paintBtn);
         manualBtn = (Button) findViewById(R.id.finalBtn);
         scrollView = (ScrollView) findViewById(R.id.scroll);
         receiveTV = (TextView) findViewById(R.id.receiveTV);
@@ -164,9 +164,9 @@ public class MainActivity extends AppCompatActivity {
         disconnectBtn.setEnabled(false);
         BasicBtn.setEnabled(false);
         VoiceBtn.setEnabled(false);
-        PaintBtn.setEnabled(false);
+        oneBtn.setEnabled(false);
         killBtn.setEnabled(false);
-        disarmBtn.setEnabled(false);
+        PaintBtn.setEnabled(false);
         manualBtn.setEnabled(false);
         sendBtn.setEnabled(false);
 
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        disarmBtn.setOnClickListener(new View.OnClickListener() {
+        PaintBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showConfirmDialog("kill\n");

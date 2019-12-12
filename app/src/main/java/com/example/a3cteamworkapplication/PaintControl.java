@@ -47,32 +47,25 @@ public class PaintControl extends AppCompatActivity
         goBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showStatus("Read " + paintView.route.size() +
-                                " sample points.\nSending messages...");
+                showStatus("Read " + paintView.route.size() +
+                        " sample points.\nSending messages...");
 
-                        goBtn.setEnabled(false);
-                        localRoute = new Vector<PaintView.pointT>(paintView.route.size());
+                goBtn.setEnabled(false);
+                localRoute = new Vector<PaintView.pointT>(paintView.route.size());
 
-                        localRoute = (Vector) paintView.route.clone();
-                        moveStraight(0);
+                localRoute = (Vector) paintView.route.clone();
+                moveStraight(0);
 
-                        for(int pStrt = 1; pStrt < paintView.route.size() - 2; pStrt++){
-                            turnAway(pStrt);
-                            moveStraight(pStrt);
-                        }
-                        localRoute.clear();
+                for(int pStrt = 1; pStrt < paintView.route.size() - 2; pStrt++){
+                    turnAway(pStrt);
+                    moveStraight(pStrt);
+                }
+                localRoute.clear();
 
-                        goBtn.setEnabled(true);
+                goBtn.setEnabled(true);
 
-                        showStatus("Last command read " + paintView.route.size() +
-                                " sample points.\nPlease draw your next route here.");
-                    }
-                });
-
-                thread.start();
+                showStatus("Last command read " + paintView.route.size() +
+                        " sample points.\nPlease draw your next route here.");
             }
         });
     }

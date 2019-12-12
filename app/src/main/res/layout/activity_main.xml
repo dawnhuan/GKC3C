@@ -86,7 +86,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="画线控制"/>
+            android:text="空闲"/>
 
 
     </LinearLayout>
@@ -109,11 +109,11 @@
             android:text="还是一个按键"/>
 
         <Button
-            android:id="@+id/dioBtn"
+            android:id="@+id/paintBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="是我按键哒！"/>
+            android:text="画线控制"/>
 
         <Button
             android:id="@+id/finalBtn"
