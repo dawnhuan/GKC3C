@@ -45,18 +45,25 @@ public class PaintControl extends AppCompatActivity
         goBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showStatus("Read " + paintView.route.size() +
-                        " sample points.\nSending messages...");
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showStatus("Read " + paintView.route.size() +
+                                " sample points.\nSending messages...");
 
-                moveStraight(0);
+                        moveStraight(0);
 
-                for(int pStrt = 1; pStrt < paintView.route.size() - 2; pStrt++){
-                    turnAway(pStrt);
-                    moveStraight(pStrt);
-                }
+                        for(int pStrt = 1; pStrt < paintView.route.size() - 2; pStrt++){
+                            turnAway(pStrt);
+                            moveStraight(pStrt);
+                        }
 
-                showStatus("Last command read " + paintView.route.size() +
-                        " sample points.\nPlease draw your next route here.");
+                        showStatus("Last command read " + paintView.route.size() +
+                                " sample points.\nPlease draw your next route here.");
+                    }
+                });
+
+                thread.start();
             }
         });
     }
@@ -71,18 +78,14 @@ public class PaintControl extends AppCompatActivity
     }
 
     private void moveStraight(int sindex){
-        if(sindex+1 >= paintView.route.size() || sindex<0)
-            return;
-        else{
+        if(sindex+1 < paintView.route.size() && sindex>0){
             double time = moveTimeRatio * Dist(paintView.route.elementAt(sindex), paintView.route.elementAt(sindex+1));
             control.go(time);
         }
     }
 
     private void turnAway(int sindex){
-        if(sindex+1 >= paintView.route.size() || sindex<0)
-            return;
-        else{
+        if(sindex+1 < paintView.route.size() && sindex>0){
             double angle = turnTimeRatio * Angle(
                     paintView.route.elementAt(sindex-1),
                     paintView.route.elementAt(sindex),
