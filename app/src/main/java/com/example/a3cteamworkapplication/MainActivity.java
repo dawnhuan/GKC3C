@@ -207,9 +207,9 @@ public class MainActivity extends AppCompatActivity {
         disconnectBtn.setEnabled(false);
         BasicBtn.setEnabled(false);
         VoiceBtn.setEnabled(false);
-        FaceBtn.setEnabled(true);
+        FaceBtn.setEnabled(false);
         killBtn.setEnabled(false);
-        PaintBtn.setEnabled(false);
+//        PaintBtn.setEnabled(false);
         manualBtn.setEnabled(false);
         sendBtn.setEnabled(false);
 

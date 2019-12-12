@@ -20,8 +20,8 @@ public class PaintControl extends AppCompatActivity
     private Vector<PaintView.pointT> localRoute;
 
     private CarControl control;
-    static final private double moveTimeRatio = 100.0;
-    static final private double turnTimeRatio = 1000.0;
+    static final private double moveTimeRatio = 0.5;
+    static final private double turnTimeRatio = 1.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,8 +60,8 @@ public class PaintControl extends AppCompatActivity
                     turnAway(pStrt);
                     moveStraight(pStrt);
                 }
-                localRoute.clear();
 
+                localRoute.clear();
                 goBtn.setEnabled(true);
 
                 showStatus("Last command read " + paintView.route.size() +
@@ -82,7 +82,7 @@ public class PaintControl extends AppCompatActivity
     private void moveStraight(int sindex){
         if(sindex+1 < localRoute.size() && sindex>0){
             double time = moveTimeRatio * Dist(localRoute.elementAt(sindex), localRoute.elementAt(sindex+1));
-            control.go(time);
+            control.go_wait(time);
         }
     }
 
@@ -94,9 +94,9 @@ public class PaintControl extends AppCompatActivity
                     localRoute.elementAt(sindex+1)
             );
             if(angle > 0)
-                control.left(angle);
+                control.left_wait(angle);
             else
-                control.right(-angle);
+                control.right_wait(-angle);
         }
     }
 
