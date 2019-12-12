@@ -2,6 +2,7 @@ package com.example.a3cteamworkapplication;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -43,6 +44,7 @@ import java.util.List;
 
 import cn.finalteam.rxgalleryfinal.RxGalleryFinalApi;
 
+@TargetApi(11)
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -461,46 +463,51 @@ public class MainActivity extends AppCompatActivity {
                             double pitch = angle.getPitch();
                             double yaw = angle.getYaw();
                             String type = expression.getType();
+                            double priority =0;
                             //none:不笑；smile:微笑；laugh:大笑
                             switch (type) {
                                 case "none":
-                                    Toast.makeText(MainActivity.this, "none 的时候不发出", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "not smile时不发出", Toast.LENGTH_SHORT).show();
                                     break;
                                 case "smile":
                                 case "laugh":
-                                    Toast.makeText(MainActivity.this, "smile的时候停止", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "smile的时候旋转180", Toast.LENGTH_SHORT).show();
                                     if (control!=null){
-                                        control.stop();
+                                        control.left(180);
                                     }
+                                    priority =1;
                                     break;
                             }
+                            if (priority==0) {
+                                if (pitch > 0 && pitch > 15) {//下旋转角度超过8时候发出 control.back();
+                                    Toast.makeText(MainActivity.this, "下旋转角度超过15时候后退", Toast.LENGTH_SHORT).show();
+                                    if (control!=null){
+                                        control.back(1);
+                                    }
 
-                            if (pitch > 0 && pitch > 8) {//下旋转角度超过30时候发出 control.back();
-                                Toast.makeText(MainActivity.this, "下旋转角度超过8时候后退", Toast.LENGTH_SHORT).show();
-                                if (control!=null){
-                                    control.back();
+                                } else if (pitch < 0 && pitch < -8) {//上旋转超过 30时候发出control.go ()
+                                    Toast.makeText(MainActivity.this, "上旋转超过8时候发出前进", Toast.LENGTH_SHORT).show();
+                                    if (control!=null){
+                                        control.go(1);
+                                    }
                                 }
 
-                            } else if (pitch < 0 && pitch < -8) {//上旋转超过 30时候发出control.go ()
-                                Toast.makeText(MainActivity.this, "上旋转超过8时候发出前进", Toast.LENGTH_SHORT).show();
-                                if (control!=null){
-                                    control.go();
+                                if (yaw < 0 && yaw < -30) {//左旋转角度超过30的时候发出 control.left()
+                                    Toast.makeText(MainActivity.this, "左旋转角度超过30的时候左转", Toast.LENGTH_SHORT).show();
+                                    if (control!=null){
+
+                                        control.right(90);
+                                    }
+                                } else if (yaw > 0 && yaw > 30) {// 右旋转角度超过30时候发出 control.right()
+                                    Toast.makeText(MainActivity.this, "右旋转角度超过30时候右转", Toast.LENGTH_SHORT).show();
+                                    if (control!=null){
+
+                                        control.left(90);
+                                    }
                                 }
                             }
 
-                            if (yaw < 0 && yaw < -30) {//左旋转角度超过30的时候发出 control.left()
-                                Toast.makeText(MainActivity.this, "左旋转角度超过30的时候左转", Toast.LENGTH_SHORT).show();
-                                if (control!=null){
 
-                                    control.left();
-                                }
-                            } else if (yaw > 0 && yaw > 30) {// 右旋转角度超过30时候发出 control.right()
-                                Toast.makeText(MainActivity.this, "右旋转角度超过30时候右转", Toast.LENGTH_SHORT).show();
-                                if (control!=null){
-
-                                    control.right();
-                                }
-                            }
 
                         } else {
                             Toast.makeText(MainActivity.this, "人脸识别失败 " + faceBean.getError_msg(), Toast.LENGTH_LONG).show();
