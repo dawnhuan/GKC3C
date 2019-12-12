@@ -31,7 +31,7 @@ public class PaintView extends View
     private Canvas myCanvas;
 
     private float mX, mY;
-    private static final float TOUCH_TOLERANCE = 4;
+    private static final float TOUCH_TOLERANCE = 10;
 
     // 记录宽度和高度
     private int mWidth;
@@ -150,7 +150,7 @@ public class PaintView extends View
         myPath.reset();
         route.clear();
         myPath.moveTo(x, y);
-        route.add(new pointT(x, y));
+        route.add(new pointT(x, -y));
         count = 0;
         mX = x;
         mY = y;
@@ -163,7 +163,7 @@ public class PaintView extends View
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE)
         {
             if(++count >= sampleInterval){
-                route.add(new pointT(x, y));
+                route.add(new pointT(x, -y));
                 count = 0;
             }
 
@@ -189,8 +189,8 @@ public class PaintView extends View
     public void clear()
     {
         // 清除方法1：重新生成位图
-         myBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-         myCanvas = new Canvas(myBitmap);
+        myBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        myCanvas = new Canvas(myBitmap);
 
         // 清除方法2：将位图清除为白色
 //        myBitmap.eraseColor(myResources.getColor(R.color.green, null));

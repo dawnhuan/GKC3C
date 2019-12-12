@@ -20,8 +20,8 @@ public class PaintControl extends AppCompatActivity
     private Vector<PaintView.pointT> localRoute;
 
     private CarControl control;
-    static final private double moveTimeRatio = 0.1;
-    static final private double turnTimeRatio = 1.0;
+    static final private double moveTimeRatio = 100.0;
+    static final private double turnTimeRatio = 1000.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

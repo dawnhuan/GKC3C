@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -12,10 +13,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -27,50 +29,44 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechUtility;
+import com.example.a3cteamworkapplication.face.AuthService;
+import com.example.a3cteamworkapplication.face.FaceBean;
+import com.example.a3cteamworkapplication.face.utils.GsonUtils;
+import com.example.a3cteamworkapplication.face.utils.ImageToBase64;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.finalteam.rxgalleryfinal.RxGalleryFinalApi;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
     private static final int SCAN_PERIOD = 1000;
-
+    private static final int REQUEST_ENABLE = 1;
+    private static final int REQUEST_DISCOVERABLE = 2;
+    public static BluetoothTool client;
     private TextView statusTV;
     private Button searchBtn;
     private Button stopSearchBtn;
     private Button disconnectBtn;
     private ListView devicesLV;
-    private Button BasicBtn, VoiceBtn, oneBtn, killBtn, PaintBtn, manualBtn;
+    private Button BasicBtn, VoiceBtn, FaceBtn, killBtn, PaintBtn, manualBtn;
     private ScrollView scrollView;
     private TextView receiveTV;
     private EditText sendET;
     private Button sendBtn;
-
     private ArrayAdapter<String> adapter;
-
     private boolean searching = false;
-
     private List<String> devicesArrayList = new ArrayList<>();
-
     private BluetoothReceiver bluetoothReceiver;
     private BluetoothAdapter bluetoothAdapter;
-
-    public static BluetoothTool client;
-
-    private static final int REQUEST_ENABLE = 1;
-    private static final int REQUEST_DISCOVERABLE = 2;
-
     private StringBuilder receiveStringBuilder = new StringBuilder();
-
-    private long exitTime;
-
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler() {
         @Override
@@ -90,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     disconnectBtn.setEnabled(true);
                     BasicBtn.setEnabled(true);
                     VoiceBtn.setEnabled(true);
-                    oneBtn.setEnabled(true);
+                    FaceBtn.setEnabled(true);
                     killBtn.setEnabled(true);
                     PaintBtn.setEnabled(true);
                     manualBtn.setEnabled(true);
@@ -104,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                     showStatus("写入失败");
                     break;
                 case BluetoothTool.DATA:
-                    receiveStringBuilder.append((String)msg.obj);
+                    receiveStringBuilder.append((String) msg.obj);
                     showReceiveString(receiveStringBuilder.toString());
                     break;
                 case BluetoothTool.DISCONNECT:
@@ -114,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     disconnectBtn.setEnabled(false);
                     BasicBtn.setEnabled(false);
                     VoiceBtn.setEnabled(false);
-                    oneBtn.setEnabled(false);
+                    FaceBtn.setEnabled(false);
                     killBtn.setEnabled(false);
                     PaintBtn.setEnabled(false);
                     manualBtn.setEnabled(false);
@@ -124,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    private long exitTime;
+    private ProgressDialog progressDialog;
+    private CarControl control;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +139,48 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(bluetoothReceiver, filter);
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(bluetoothReceiver, filter);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(bluetoothReceiver);
+        super.onDestroy();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (System.currentTimeMillis() - exitTime > 2000) {
+            Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            exitTime = System.currentTimeMillis();
+        } else {
+            finish();
+        }
+        return true;
+    }
+
+    public void requestPermissions() {
+        try {
+            if (Build.VERSION.SDK_INT >= 23) {
+                int permission = ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                if (permission != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    Manifest.permission.LOCATION_HARDWARE, Manifest.permission.READ_PHONE_STATE,
+                                    Manifest.permission.WRITE_SETTINGS, Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_CONTACTS}, 0x0010);
+                }
+
+                if (permission != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION}, 0x0010);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupUI() {
@@ -151,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
         BasicBtn = (Button) findViewById(R.id.BasicBtn);
         VoiceBtn = (Button) findViewById(R.id.VoiceBtn);
-        oneBtn = (Button) findViewById(R.id.PaintBtn);
+        FaceBtn = (Button) findViewById(R.id.FaceBtn);
         killBtn = (Button) findViewById(R.id.againOneBtn);
         PaintBtn = (Button) findViewById(R.id.paintBtn);
         manualBtn = (Button) findViewById(R.id.finalBtn);
@@ -164,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
         disconnectBtn.setEnabled(false);
         BasicBtn.setEnabled(false);
         VoiceBtn.setEnabled(false);
-        oneBtn.setEnabled(false);
+        FaceBtn.setEnabled(true);
         killBtn.setEnabled(false);
         PaintBtn.setEnabled(false);
         manualBtn.setEnabled(false);
@@ -179,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                 showStatus("搜索中...");
                 devicesArrayList.clear();
                 showDevices();
-                if(bluetoothAdapter != null)
+                if (bluetoothAdapter != null)
                     bluetoothAdapter.startDiscovery();
             }
         });
@@ -190,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                 searching = false;
                 stopSearchBtn.setEnabled(false);
                 searchBtn.setEnabled(true);
-                if(bluetoothAdapter != null)
+                if (bluetoothAdapter != null)
                     bluetoothAdapter.cancelDiscovery();
             }
         });
@@ -211,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
         devicesLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(searching) {
+                if (searching) {
                     bluetoothAdapter.cancelDiscovery();
                     searching = false;
                     searchBtn.setEnabled(true);
@@ -247,12 +288,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        oneBtn.setOnClickListener(new View.OnClickListener() {
+        FaceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                takeCamera();
             }
         });
+
 
         killBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -290,54 +332,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void enableBluetooth() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(!bluetoothAdapter.isEnabled()) {
+        if (!bluetoothAdapter.isEnabled()) {
             bluetoothAdapter.enable();
         }
         Intent enable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         enable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         startActivityForResult(enable, REQUEST_DISCOVERABLE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_DISCOVERABLE:
-                if(resultCode == Activity.RESULT_CANCELED) {
-                    showStatus("蓝牙已关闭");
-                } else {
-                    showStatus("蓝牙已打开");
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        unregisterReceiver(bluetoothReceiver);
-        super.onDestroy();
-    }
-
-    private class BluetoothReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if(BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                String str = device.getName() + " | " + device.getAddress();
-                Log.d(TAG, str);
-                if(devicesArrayList.indexOf(str) == -1)
-                    devicesArrayList.add(str);
-                showDevices();
-            }
-            else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                showStatus("已停止搜索");
-                searching = false;
-                searchBtn.setEnabled(true);
-                stopSearchBtn.setEnabled(false);
-            }
-        }
     }
 
     private void showStatus(final String string) {
@@ -354,31 +354,28 @@ public class MainActivity extends AppCompatActivity {
         devicesLV.smoothScrollToPosition(devicesArrayList.size() - 1);
     }
 
-    private void showReceiveString(final String string) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                receiveTV.setText(string);
-                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });
+    /**
+     * 调用相机
+     */
+    private void takeCamera() {
+        RxGalleryFinalApi.openZKCamera(this);
     }
 
     private void showConfirmDialog(final String action) {
         String str = "";
-        if(action.equals("start\n")) {
+        if (action.equals("start\n")) {
             str = "启动";
-        } else if(action.equals("arm\n")) {
+        } else if (action.equals("arm\n")) {
             str = "解锁";
-        } else if(action.equals("takeoff\n")) {
+        } else if (action.equals("takeoff\n")) {
             str = "起飞";
-        } else if(action.equals("kill\n")) {
+        } else if (action.equals("kill\n")) {
             str = "紧急停止";
-        } else if(action.equals("disarm\n")) {
+        } else if (action.equals("disarm\n")) {
             str = "锁定";
-        } else if(action.equals("manual\n")) {
+        } else if (action.equals("manual\n")) {
             str = "手动控制";
-        } else if(action.equals("test\n")) {
+        } else if (action.equals("test\n")) {
             str = "启用视觉";
         }
 
@@ -403,38 +400,165 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(System.currentTimeMillis() - exitTime > 2000) {
-            Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
-            exitTime = System.currentTimeMillis();
-        } else {
-            finish();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_DISCOVERABLE:
+                if (resultCode == Activity.RESULT_CANCELED) {
+                    showStatus("蓝牙已关闭");
+                } else {
+                    showStatus("蓝牙已打开");
+                }
+                break;
+
+            case RxGalleryFinalApi.TAKE_IMAGE_REQUEST_CODE:
+                startFaceDetect();
+                break;
+            default:
+                break;
         }
-        return true;
     }
 
-    public void requestPermissions()
-    {
-        try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                int permission = ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                if(permission!= PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this,new String[]
-                            {Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                    Manifest.permission.LOCATION_HARDWARE,Manifest.permission.READ_PHONE_STATE,
-                                    Manifest.permission.WRITE_SETTINGS,Manifest.permission.READ_EXTERNAL_STORAGE,
-                                    Manifest.permission.RECORD_AUDIO,Manifest.permission.READ_CONTACTS},0x0010);
-                }
+    /**
+     * 调用百度接口开始人脸识别
+     */
+    private void startFaceDetect() {
+        final String imagePath = RxGalleryFinalApi.fileImagePath.getPath();  //image 工具类
+        buildProgressDialog();
+        //开启子线程进行网络请求
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-                if(permission != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this,new String[] {
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION},0x0010);
-                }
+                final String authToken = AuthService.getAuth();
+                Log.e("hedb", "initView: " + authToken);
+                String base64 = ImageToBase64.imgToBase64(ImageToBase64.compressImage(imagePath));
+                String faceDetect = AuthService.faceDetect(base64, authToken);
+                Log.e("hedb", "run: " + faceDetect);
+                final FaceBean faceBean = GsonUtils.fromJson(faceDetect, FaceBean.class);
+                cancelProgressDialog();
+                //主线程中更新UI操作
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+//                        type 里面返回 smile 和 laugh 的时候 发出 control.stop (); none 的时候不发出
+//                        yaw  左旋转角度超过30的时候发出 control.left();  右旋转角度超过30时候发出 control.right()
+//                        pitch 上旋转超过 8时候发出control.go () ; 下旋转角度超过8时候发出 control.back();
+//
+                        if (faceBean == null) {
+                            return;
+                        }
+
+                        if (client!=null){
+                            control = new CarControl(MainActivity.client);
+                        }else {
+                            Toast.makeText(MainActivity.this, "蓝牙设备未连接", Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (faceBean.getError_code() == 0) {
+                            FaceBean.ResultBean.FaceListBean faceListBean = faceBean.getResult().getFace_list().get(0);
+                            FaceBean.ResultBean.FaceListBean.AngleBean angle = faceListBean.getAngle();
+                            FaceBean.ResultBean.FaceListBean.ExpressionBean expression = faceListBean.getExpression();
+                            double pitch = angle.getPitch();
+                            double yaw = angle.getYaw();
+                            String type = expression.getType();
+                            //none:不笑；smile:微笑；laugh:大笑
+                            switch (type) {
+                                case "none":
+                                    Toast.makeText(MainActivity.this, "none 的时候不发出", Toast.LENGTH_SHORT).show();
+                                    break;
+                                case "smile":
+                                case "laugh":
+                                    Toast.makeText(MainActivity.this, "smile的时候停止", Toast.LENGTH_SHORT).show();
+                                    if (control!=null){
+                                        control.stop();
+                                    }
+                                    break;
+                            }
+
+                            if (pitch > 0 && pitch > 8) {//下旋转角度超过30时候发出 control.back();
+                                Toast.makeText(MainActivity.this, "下旋转角度超过8时候后退", Toast.LENGTH_SHORT).show();
+                                if (control!=null){
+                                    control.back();
+                                }
+
+                            } else if (pitch < 0 && pitch < -8) {//上旋转超过 30时候发出control.go ()
+                                Toast.makeText(MainActivity.this, "上旋转超过8时候发出前进", Toast.LENGTH_SHORT).show();
+                                if (control!=null){
+                                    control.go();
+                                }
+                            }
+
+                            if (yaw < 0 && yaw < -30) {//左旋转角度超过30的时候发出 control.left()
+                                Toast.makeText(MainActivity.this, "左旋转角度超过30的时候左转", Toast.LENGTH_SHORT).show();
+                                if (control!=null){
+
+                                    control.left();
+                                }
+                            } else if (yaw > 0 && yaw > 30) {// 右旋转角度超过30时候发出 control.right()
+                                Toast.makeText(MainActivity.this, "右旋转角度超过30时候右转", Toast.LENGTH_SHORT).show();
+                                if (control!=null){
+
+                                    control.right();
+                                }
+                            }
+
+                        } else {
+                            Toast.makeText(MainActivity.this, "人脸识别失败 " + faceBean.getError_msg(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                // 使用文件 File 获取 Compress 实例
+                Bitmap smallBitmap = ImageToBase64.getSmallBitmap(imagePath);
+
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }).start();
+    }
+
+    public void buildProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        }
+        progressDialog.setMessage("人脸识别中...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+
+    public void cancelProgressDialog() {
+        if (progressDialog != null)
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+    }
+
+    private void showReceiveString(final String string) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                receiveTV.setText(string);
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
+    }
+
+    private class BluetoothReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String str = device.getName() + " | " + device.getAddress();
+                Log.d(TAG, str);
+                if (devicesArrayList.indexOf(str) == -1)
+                    devicesArrayList.add(str);
+                showDevices();
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                showStatus("已停止搜索");
+                searching = false;
+                searchBtn.setEnabled(true);
+                stopSearchBtn.setEnabled(false);
+            }
         }
     }
 }
