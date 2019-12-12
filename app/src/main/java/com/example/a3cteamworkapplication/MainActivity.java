@@ -247,11 +247,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        PaintBtn.setOnClickListener(new View.OnClickListener() {
+        oneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, PaintControl.class);
-                startActivity(intent);
+
             }
         });
 
@@ -268,7 +267,8 @@ public class MainActivity extends AppCompatActivity {
         PaintBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showConfirmDialog("kill\n");
+                Intent intent = new Intent(MainActivity.this, PaintControl.class);
+                startActivity(intent);
             }
         });
 
