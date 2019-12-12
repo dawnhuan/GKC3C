@@ -1,12 +1,13 @@
 package com.example.a3cteamworkapplication;
 
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Vector;
 
 import static java.lang.Math.acos;
 import static java.lang.Math.sqrt;
@@ -16,6 +17,7 @@ public class PaintControl extends AppCompatActivity
     TextView toastText;
     Button clearBtn, goBtn;
     PaintView paintView;
+    private Vector<PaintView.pointT> localRoute;
 
     private CarControl control;
     static final private double moveTimeRatio = 0.1;
@@ -31,7 +33,7 @@ public class PaintControl extends AppCompatActivity
         clearBtn = findViewById(R.id.btn_paint_clear);
         goBtn = findViewById(R.id.btn_paint_go);
         toastText = findViewById(R.id.text_paint);
-
+        localRoute = new Vector<>();
         control = new CarControl(MainActivity.client);
 
         clearBtn.setOnClickListener(new View.OnClickListener() {
@@ -51,12 +53,19 @@ public class PaintControl extends AppCompatActivity
                         showStatus("Read " + paintView.route.size() +
                                 " sample points.\nSending messages...");
 
+                        goBtn.setEnabled(false);
+                        localRoute = new Vector<PaintView.pointT>(paintView.route.size());
+
+                        localRoute = (Vector) paintView.route.clone();
                         moveStraight(0);
 
                         for(int pStrt = 1; pStrt < paintView.route.size() - 2; pStrt++){
                             turnAway(pStrt);
                             moveStraight(pStrt);
                         }
+                        localRoute.clear();
+
+                        goBtn.setEnabled(true);
 
                         showStatus("Last command read " + paintView.route.size() +
                                 " sample points.\nPlease draw your next route here.");
@@ -78,18 +87,18 @@ public class PaintControl extends AppCompatActivity
     }
 
     private void moveStraight(int sindex){
-        if(sindex+1 < paintView.route.size() && sindex>0){
-            double time = moveTimeRatio * Dist(paintView.route.elementAt(sindex), paintView.route.elementAt(sindex+1));
+        if(sindex+1 < localRoute.size() && sindex>0){
+            double time = moveTimeRatio * Dist(localRoute.elementAt(sindex), localRoute.elementAt(sindex+1));
             control.go(time);
         }
     }
 
     private void turnAway(int sindex){
-        if(sindex+1 < paintView.route.size() && sindex>0){
+        if(sindex+1 < localRoute.size() && sindex>0){
             double angle = turnTimeRatio * Angle(
-                    paintView.route.elementAt(sindex-1),
-                    paintView.route.elementAt(sindex),
-                    paintView.route.elementAt(sindex+1)
+                    localRoute.elementAt(sindex-1),
+                    localRoute.elementAt(sindex),
+                    localRoute.elementAt(sindex+1)
             );
             if(angle > 0)
                 control.left(angle);
