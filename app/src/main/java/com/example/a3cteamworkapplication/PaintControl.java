@@ -20,8 +20,9 @@ public class PaintControl extends AppCompatActivity
     private Vector<PaintView.pointT> localRoute;
 
     private CarControl control;
-    static final private double moveTimeRatio = 0.5;
-    static final private double turnTimeRatio = 1.0;
+    static final private double moveTimeRatio = 2.0;
+    static final private double leftTurnTimeRatio = 70.0;
+    static final private double rightTurnTimeRatio = 45.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -88,15 +89,15 @@ public class PaintControl extends AppCompatActivity
 
     private void turnAway(int sindex){
         if(sindex+1 < localRoute.size() && sindex>0){
-            double angle = turnTimeRatio * Angle(
+            double angle = Angle(
                     localRoute.elementAt(sindex-1),
                     localRoute.elementAt(sindex),
                     localRoute.elementAt(sindex+1)
             );
             if(angle > 0)
-                control.left_wait(angle);
+                control.left_wait(angle * leftTurnTimeRatio);
             else
-                control.right_wait(-angle);
+                control.right_wait(-angle * rightTurnTimeRatio);
         }
     }
 

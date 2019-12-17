@@ -48,7 +48,7 @@ public class PaintView extends View
     }
     public Vector<pointT> route;
     private int count;
-    private static final int sampleInterval = 3;
+    private static final int sampleInterval = 2;
 
     public PaintView(Context context)
     {

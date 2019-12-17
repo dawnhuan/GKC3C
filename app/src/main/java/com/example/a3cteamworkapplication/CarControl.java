@@ -95,65 +95,37 @@ public class CarControl {
     public void go_wait(double time) //前进时间
     {
         go();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                stop();
-                notify();
-            }
-        };
-        Timer timer = new Timer();
-        timer.schedule(task, (long)(time*1000));
+
         try{
-            timer.wait();
+            Thread.sleep((long)time);
         }catch (Exception e){}
+        stop();
     }
     public void back_wait(double time)
     {
         back();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                stop();
-                notify();
-            }
-        };
-        Timer timer = new Timer();
-        timer.schedule(task, (long)(time*1000));
+
         try{
-            timer.wait();
+            Thread.sleep((long)time);
         }catch (Exception e){}
+        stop();
     }
     public void left_wait(double angle) //转向的角度
     {
         left();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                stop();
-                notify();
-            }
-        };
-        Timer timer = new Timer();
-        timer.schedule(task, (long)(angle*leftRate));
+
         try{
-            timer.wait();
+            Thread.sleep((long)(angle*leftRate));
         }catch (Exception e){}
+        stop();
     }
     public void right_wait(double angle)
     {
         right();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                stop();
-                notify();
-            }
-        };
-        Timer timer = new Timer();
-        timer.schedule(task, (long)(angle*rightRate));
+
         try{
-            timer.wait();
+            Thread.sleep((long)(angle*rightRate));
         }catch (Exception e){}
+        stop();
     }
 }
