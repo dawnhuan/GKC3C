@@ -301,10 +301,8 @@ public class MainActivity extends AppCompatActivity {
         killBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //showConfirmDialog("kill\n");
-                BluetoothTool.WriteTask writeTask = client.new WriteTask("disarm\n");
-                writeTask.start();
-                Toast.makeText(MainActivity.this, "已发送", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, GravityControl.class);
+                startActivity(intent);
             }
         });
 
