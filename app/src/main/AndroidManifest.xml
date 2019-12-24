@@ -14,6 +14,7 @@
         <activity android:name=".test" />
         <activity android:name=".BasicControl" />
         <activity android:name=".PaintControl" />
+        <activity android:name=".GravityControl" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
