@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
         manualBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showConfirmDialog("manual\n");
+
             }
         });
 

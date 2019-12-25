@@ -80,6 +80,33 @@ public class CarControl {
         Timer timer = new Timer();
         timer.schedule(task, (long)(angle*leftRate));
     }
+
+    public void left_time(double time) //前进时间
+    {
+        left();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                stop();
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule(task, (long)(time*1000));
+    }
+
+    public void right_time(double time) //前进时间
+    {
+        right();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                stop();
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule(task, (long)(time*1000));
+    }
+
     public void right(double angle)
     {
         right();

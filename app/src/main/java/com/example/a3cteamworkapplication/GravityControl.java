@@ -17,6 +17,10 @@ public class GravityControl extends AppCompatActivity {
     OrientationEventListener mOrientationListener;
     private CarControl control;
     public boolean flag = true;
+    public boolean flagg = false;
+    public boolean flagb = false;
+    public boolean flagl = false;
+    public boolean flagr = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,10 @@ public class GravityControl extends AppCompatActivity {
             public void onClick(View view) {
                 control.stop();
                 flag=false;
+                flagg = false;
+                flagb = false;
+                flagl = false;
+                flagr = false;
             }
         });
 
@@ -50,21 +58,30 @@ public class GravityControl extends AppCompatActivity {
             @Override
             public void onOrientationChanged(int orientation) {
                 if (orientation == OrientationEventListener.ORIENTATION_UNKNOWN) {
+                    flagg = false;
+                    flagb = false;
+                    flagr = false;
+                    flagl = false;
+                    control.stop();
                     return;  //手机平放时，检测不到有效的角度
                 }
 
                 if (flag) {
-                    if (orientation > 350 || orientation < 10) {
+                    if (flagb || orientation > 350 || orientation < 10) {
                         orientation = 0;
-                        control.go();
-                    } else if (orientation > 30 && orientation < 100) {
-                        control.right();
-                        orientation = 90;
-                    } else if (orientation > 170 && orientation < 190) {
-                        orientation = 180;
+                        flagb = true;
                         control.back();
-                    } else if (orientation > 260 && orientation < 340) {
+                    } else if (flagr || orientation > 30 && orientation < 100) {
+                        orientation = 90;
+                        flagr = true;
+                        control.right();
+                    } else if (flagg || orientation > 170 && orientation < 190) {
+                        orientation = 180;
+                        flagg = true;
+                        control.go();
+                    } else if (flagl || orientation > 260 && orientation < 340) {
                         orientation = 270;
+                        flagl = true;
                         control.left();
                     } else {
                         return;
