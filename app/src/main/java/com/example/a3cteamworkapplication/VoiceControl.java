@@ -132,87 +132,102 @@ public class VoiceControl extends AppCompatActivity {
             Log.d(TAG, results.getResultString());
             //System.out.println(flg++);
             String command = results.getResultString();
-
-            int direction = -1;
-            for (int i = 0; i < command.length(); i++)
-            {
-                if (command.charAt(i) == '前') {
-                    direction = 0; break;
-                }
-                else if (command.charAt(i) == '后' || command.charAt(i) == '退'){
-                    direction = 1; break;
-                }
-                else if (command.charAt(i) == '左'){
-                    direction = 2; break;
-                }
-                else if (command.charAt(i) == '右'){
-                    direction = 3; break;
-                }
-                else if (command.charAt(i) == '停'){
-                    direction = 4; break;
-                }
-            }
-            int number = 0;
-            for (int i = 0; i < command.length(); i++)
-            {
-                int end = i;
-                while (command.charAt(end) <= '9' && command.charAt(end) >= '0')
-                    end++;
-                if (end != i)
-                {
-                    number = Integer.parseInt(command.substring(i, end));
-                    break;
-                }
-                if (command.charAt(i) == '一') {
-                    number = 1; break;
-                }
-                else if (command.charAt(i) == '二' || command.charAt(i) == '两') {
-                    number = 2;
-                    break;
-                }
-                else if (command.charAt(i) == '三'){
-                    number = 3; break;
-                }
-            }
-            switch (direction){
-                case -1:
-                    showTip("无效指令");  break;
-                case 0:
-                    if (number == 0){
-                        control.go();
-                    }
-                    else{
-                        control.go(number);
-                    }
-                    break;
-                case 1:
-                    if (number == 0){
-                        control.back();
-                    }
-                    else{
-                        control.back(number);
-                    }
-                    break;
-                case 2:
-                    if (number == 0){
-                        control.left();
-                    }
-                    else{
-                        control.left(number);
-                    }
-                    break;
-                case 3:
-                    if (number == 0){
-                        control.right();
-                    }
-                    else{
-                        control.right(number);
-                    }
-                    break;
-                case 4:
-                    control.stop(); break;
-            }
             text.setText(command);
+            String[] commands = command.split(",|。|，| |再|然后|最后");
+            for (int cnum = 0; cnum < commands.length; cnum++) {
+                command = commands[cnum];
+                //方向
+                int direction = -1;
+                for (int i = 0; i < command.length(); i++) {
+                    if (command.charAt(i) == '前') {
+                        direction = 0;
+                        break;
+                    } else if (command.charAt(i) == '后' || command.charAt(i) == '退') {
+                        direction = 1;
+                        break;
+                    } else if (command.charAt(i) == '左') {
+                        direction = 2;
+                        break;
+                    } else if (command.charAt(i) == '右') {
+                        direction = 3;
+                        break;
+                    } else if (command.charAt(i) == '停') {
+                        direction = 4;
+                        break;
+                    }
+                }
+                //数字
+                double number = 0;
+                int unit = 0;
+                for (int i = 0; i < command.length(); i++) {
+                    int end = i;
+                    while ((command.charAt(end) <= '9' && command.charAt(end) >= '0') || command.charAt(end) == '.')
+                        end++;
+                    if (end != i) {
+                        number = Double.parseDouble(command.substring(i, end));
+                        unit = end;
+                        break;
+                    }
+
+                    if (command.charAt(i) == '一') {
+                        number = 1; unit = i+1;
+                        break;
+                    } else if (command.charAt(i) == '二' || command.charAt(i) == '两') {
+                        number = 2; unit = i+1;
+                        break;
+                    } else if (command.charAt(i) == '三') {
+                        number = 3; unit = i+1;
+                        break;
+                    } else if (command.charAt(i) == '半') {
+                        number = 0.5; unit = i+1;
+                        break;
+                    }
+                }
+                //单位
+                if (command.charAt(unit) == '度' && (direction == 2 || direction == 3))
+                {                }
+                else if (command.charAt(unit) == '秒' && (direction == 0 || direction == 1))
+                {                }
+                else if (number == 0)
+                {                }
+                else
+                    continue;
+
+                switch (direction) {
+                    case 0:
+                        if (number == 0) {
+                            control.go();
+                        } else {
+                            control.go_wait(number*1000);
+                        }
+                        break;
+                    case 1:
+                        if (number == 0) {
+                            control.back();
+                        } else {
+                            control.back_wait(number*1000);
+                        }
+                        break;
+                    case 2:
+                        if (number == 0) {
+                            control.left();
+                        } else {
+                            control.left_wait(number);
+                        }
+                        break;
+                    case 3:
+                        if (number == 0) {
+                            control.right();
+                        } else {
+                            control.right_wait(number);
+                        }
+                        break;
+                    case 4:
+                        control.stop();
+                        break;
+                }
+            }
+
         }
 
         @Override

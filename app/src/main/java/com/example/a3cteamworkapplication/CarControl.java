@@ -142,8 +142,8 @@ public class CarControl {
         left();
 
         try{
-            Thread.sleep((long)(angle*leftRate));
-        }catch (Exception e){}
+        Thread.sleep((long)(angle*leftRate));
+    }catch (Exception e){}
         stop();
     }
     public void right_wait(double angle)

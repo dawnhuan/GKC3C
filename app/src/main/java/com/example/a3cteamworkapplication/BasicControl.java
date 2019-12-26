@@ -3,6 +3,7 @@ package com.example.a3cteamworkapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +19,7 @@ public class BasicControl extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basic_control);
-
+        GetContext.context = getApplicationContext();
         go = (Button) findViewById(R.id.go);
         back = (Button) findViewById(R.id.back);
         right = (Button) findViewById(R.id.right);

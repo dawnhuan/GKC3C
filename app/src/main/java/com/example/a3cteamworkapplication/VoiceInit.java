@@ -1,6 +1,7 @@
 package com.example.a3cteamworkapplication;
 
 import android.app.Application;
+import android.content.Context;
 import android.widget.Toast;
 
 import com.iflytek.cloud.Setting;
@@ -8,7 +9,7 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 
 public class VoiceInit extends Application {
-
+    private static Context context;
     @Override
     public void onCreate() {
         // 应用程序入口处调用，避免手机内存过小，杀死后台进程后通过历史intent进入Activity造成SpeechUtility对象为null
@@ -29,6 +30,11 @@ public class VoiceInit extends Application {
         // 以下语句用于设置日志开关（默认开启），设置成false时关闭语音云SDK日志打印
         // Setting.setShowLog(false);
         super.onCreate();
+        context = getApplicationContext();
     }
+    public static Context getContext() {
+        return context;
+    }
+
 
 }

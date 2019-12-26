@@ -1,20 +1,25 @@
 package com.example.a3cteamworkapplication;
 
+import android.app.Application;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BluetoothTool {
-
+    private Lock lock = new ReentrantLock();
     private static final String TAG = "BluetoothTool";
 
     private BluetoothDevice device;
@@ -58,8 +63,8 @@ public class BluetoothTool {
                     socket.connect();
                     isConnect = true;
                     setState(CONNECT_SUCCESS);
-                    BluetoothTool.this.readTask = new ReadTask();
-                    BluetoothTool.this.readTask.start();
+                    //BluetoothTool.this.readTask = new ReadTask();
+                    //BluetoothTool.this.readTask.start();
                 } catch (Exception e) {
                     setState(CONNECT_FAILED);
                     Log.e(TAG, e.toString());
@@ -126,13 +131,13 @@ public class BluetoothTool {
 
     public class WriteTask extends Thread {
         private String str;
-
         public WriteTask(String str) {
             this.str = str;
         }
 
         @Override
         public void run() {
+            lock.lock();
             OutputStream outputStream = null;
             byte[] out_data = str.getBytes();
             try {
@@ -141,7 +146,46 @@ public class BluetoothTool {
             } catch (Exception e) {
                 setState(WRITE_FAILED);
                 e.printStackTrace();
+
+                new Thread(){
+                    @Override
+                    public void run(){
+                        Looper.prepare();
+                        Toast.makeText(VoiceInit.getContext(), "蓝牙已断开，正在重连", Toast.LENGTH_LONG).show();
+                        Looper.loop();
+                    };
+                }.start();
+
+                try{
+                    Thread.sleep((long) 500);
+                }catch (Exception error){}
+                try {
+                    socket.connect();
+                    isConnect = true;
+                    setState(CONNECT_SUCCESS);
+                    outputStream.write(out_data);
+                    new Thread(){
+                        @Override
+                        public void run(){
+                            Looper.prepare();
+                            Toast.makeText(VoiceInit.getContext(), "连接成功", Toast.LENGTH_LONG).show();
+                            Looper.loop();
+                        };
+                    }.start();
+                } catch (Exception error) {
+                    setState(CONNECT_FAILED);
+                    Log.e(TAG, error.toString());
+                    new Thread(){
+                        @Override
+                        public void run(){
+                            Looper.prepare();
+                            Toast.makeText(VoiceInit.getContext(), "连接失败", Toast.LENGTH_LONG).show();
+                            Looper.loop();
+                        };
+                    }.start();
+                }
             }
+            lock.unlock();
         }
     }
 
